@@ -34,7 +34,10 @@ const deleteCard = ((req, res) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'TypeError') {
+      if (err.name === 'CastError') {
+        res.status(ERROR_CODE).send({ message: "Некорректные данные карточки" });
+      }
+      else if (err.name === 'TypeError') {
         res.status(NOT_FOUND).send({ message: `Карточка с указанным '_id=${req.params.cardId}' не найдена` });
       } else {
         res.status(SERVER_ERROR).send({ message: "Неизвестная ошибка сервера" });
