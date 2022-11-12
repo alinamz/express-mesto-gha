@@ -20,4 +20,10 @@ app.use(bodyParser.json());
 app.use(require('./routes/user'));
 app.use(require('./routes/card'));
 
+// Обработка несуществующего метода
+app.use(function(req, res) {
+  res.status(404).json({ message: 'Указанный метод не найден' });
+  return;
+});
+
 app.listen(3000);

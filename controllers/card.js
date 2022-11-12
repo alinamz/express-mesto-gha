@@ -24,19 +24,17 @@ const createCard = ((req, res) => {
 })
 
 const deleteCard = ((req, res) => {
-  Card.findById(req.params.cardId)
+  Card.findById(req.params)
     .then((card) => {
       if (card.owner.equals(req.user._id)) {
         card.remove().then(() => res.send({ data: card }));
-      } else if (!card) {
-        res.status(NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
       } else {
-        throw new Error();
+       res.status(ERROR_CODE).send({ message: "Некорректные данные карточки" });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE).send({ message: "Некорректные данные карточки." });
+        res.status(NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
       } else {
         res.status(SERVER_ERROR).send({ message: "Неизвестная ошибка сервера" });
       }
