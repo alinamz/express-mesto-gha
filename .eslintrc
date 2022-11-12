@@ -4,7 +4,6 @@
     "no-console":"off",
     "no-underscore-dangle": ["error", { "allow": ["_id"] }]
   },
-  // add your environment below the extends key, like this:
   "env": {
     "node": true,
     "browser": true
