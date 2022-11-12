@@ -11,8 +11,8 @@ const getCards = ((req, res) => {
 })
 
 const createCard = ((req, res) => {
-  const { _id, name, link } = req.body;
-  Card.create({ name, link, owner: _id })
+  const { name, link } = req.body;
+  Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -26,7 +26,7 @@ const createCard = ((req, res) => {
 const deleteCard = ((req, res) => {
   Card.findById(req.params.cardId)
     .then((card) => {
-      if (card.owner.equals(req.query._id)) {
+      if (card.owner.equals(req.user._id)) {
         card.remove().then(() => res.send({ data: card }));
       } else if (!card) {
         res.status(NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
@@ -44,16 +44,18 @@ const deleteCard = ((req, res) => {
 })
 
 const likeCard = (req, res) => {
+  console.log("Here");
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.query._id } },
+    { $addToSet: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {
       if (!card) {
         res.status(NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
-      }
+      } else {
       res.send({ data: card })
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -67,7 +69,7 @@ const likeCard = (req, res) => {
 const dislikeCard = (req, res) =>
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.query._id } },
+    { $pull: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {

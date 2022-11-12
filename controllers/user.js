@@ -14,13 +14,18 @@ const getUserId = ((req, res) => {
   const userId = req.params.id;
   User.findById(userId)
     .then((user) => {
-     if(user == null) {
-      res.status(ERROR_CODE).send({ message: "Некорректные данные при получении пользователя" });
-     } else {
+      if (user == null) {
+        res.status(NOT_FOUND).send({ message: "Пользователь с указанным _id не найден" });
+      }
       res.send(user);
-     }
     })
-    .catch(() => res.status(SERVER_ERROR).send({ message: "Неизвестная ошибка сервера" }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(ERROR_CODE).send({ message: 'Некорректные данные при получении пользователя' });
+      } else {
+        res.status(SERVER_ERROR).send({ message: 'Неизвестная ошибка сервера' });
+      }
+    });
 });
 
 const createUser = ((req, res) => {
@@ -38,7 +43,10 @@ const createUser = ((req, res) => {
 
 const updateUser = ((req, res) => {
   const { _id, name, about } = req.body;
-  User.findByIdAndUpdate(_id, { name, about })
+  User.findByIdAndUpdate(_id, { name, about },  {
+    new: true,
+    runValidators: true,
+  })
     .then((user) => {
       if (!user) {
         res.status(NOT_FOUND).send({ message: "Пользователь с указанным _id не найден." })
@@ -57,10 +65,14 @@ const updateUser = ((req, res) => {
 
 const updateAvatar = ((req, res) => {
   const { _id, avatar } = req.body;
-  User.findByIdAndUpdate(_id, { avatar })
+  User.findByIdAndUpdate(_id, { avatar }, {
+    new: true,
+    runValidators: true,
+  })
     .then((user) => {
       if (!user) {
-        res.status(NOT_FOUND).send({ message: "Пользователь с указанным _id не найден."});
+        console.log(user)
+        res.status(NOT_FOUND).send({ message: "Пользователь с указанным _id не найден." });
       } else {
         res.send({ data: user });
       }
