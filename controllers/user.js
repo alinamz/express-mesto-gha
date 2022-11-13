@@ -5,25 +5,16 @@ const NOT_FOUND = 404;
 const SERVER_ERROR = 500;
 
 const getUsers = ((_, res) => {
-  User.find({})
-    .then((users) => {
-      if (!users) {
-        res.status(ERROR_CODE).send({ message: 'Некорректные данные' });
-      } else {
-        res.send({ data: users });
-      }
-    })
-    .catch(() => res.status(SERVER_ERROR).send({ message: 'Неизвестная ошибка сервера' }));
+  User.find({}).then((users) => res.send({ data: users })).catch(() => res.status(SERVER_ERROR).send({ message: 'Неизвестная ошибка сервера' }));
 });
 
 const getUserId = ((req, res) => {
   const userId = req.params.id;
   User.findById(userId)
     .then((user) => {
-      if (user == null) {
+      if (!user) {
         res.status(NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден' });
-      }
-      res.send(user);
+      } else { res.send(user); }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
