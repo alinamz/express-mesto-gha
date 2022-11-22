@@ -32,13 +32,13 @@ const userBodyValidator = celebrate({
 });
 
 const userAvatarValidator = celebrate({
-  params: Joi.object().keys({
+  body: Joi.object().keys({
     avatar: Joi.string().regex(linkAvatar).uri({ scheme: ['http', 'https'] }),
   }),
 });
 
 const userDescriptionValidator = celebrate({
-  params: Joi.object().keys({
+  body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
   }),

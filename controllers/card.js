@@ -48,9 +48,11 @@ const deleteCard = ((req, res, next) => {
 const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((card) => {
-      if (!card) {
-        throw new NotFoundError(`Карточка с указанным '_id=${req.params.cardId}' не найдена`);
-      } else { res.send({ data: card }); }
+      if (card) {
+        res.send({ data: card });
+      } else {
+        next(new NotFoundError(`Карточка с указанным '_id=${req.params.cardId}' не найдена`));
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -65,7 +67,7 @@ const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((card) => {
       if (!card) {
-        throw new NotFoundError(`Карточка с указанным '_id=${req.params.cardId}' не найдена`);
+        next(new NotFoundError(`Карточка с указанным '_id=${req.params.cardId}' не найдена`));
       } else { res.send({ data: card }); }
     })
     .catch((err) => {
