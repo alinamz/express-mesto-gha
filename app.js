@@ -32,8 +32,9 @@ app.use((req, res) => {
 
 app.use(errors());
 
-app.use((err, req, res) => {
-  res.status(500).send({ message: 'На сервере произошла ошибка' });
+app.use((err, req, res, next) => {
+  res.status(err.statusCode).send({ message: err.message });
+  next();
 });
 
 app.listen(3000);
