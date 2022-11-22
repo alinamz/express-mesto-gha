@@ -21,14 +21,15 @@ const getUserId = ((req, res, next) => {
   const userId = req.params.id;
   User.findById(userId)
     .then((user) => {
-      if (user !== true) {
-        throw new NotFoundError('Пользователь с указанным _id не найден');
-      } else { res.send(user); }
+      if (user) {
+        res.send(user);
+      } else { next(new NotFoundError('Пользователь с указанным _id не найден')); }
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         next(new ErrorCode('Некорректные данные при получении пользователя'));
       } else {
+        console.log(err);
         next(new ServerError('Неизвестная ошибка сервера'));
       }
     });
