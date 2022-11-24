@@ -33,7 +33,9 @@ const deleteCard = ((req, res, next) => {
       } else if (card.owner.toString() !== req.user._id) {
         next(new OwnershipError('Нет доступа'));
       } else {
-        card.remove().then(() => res.send({ data: card }));
+        card.remove()
+          .then(() => res.send({ data: card }))
+          .catch(next);
       }
     })
     .catch((err) => {

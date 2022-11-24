@@ -4,6 +4,8 @@ const validator = require('validator');
 
 const linkAvatar = /^https?:\/\/(www\.)?[a-zA-Z\0-9]+\.[\w\-._~:/?#[\]@!$&'()*+,;=]{2,}#?$/;
 
+const LoginFailed = require('../errors/LoginFailed');
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -45,12 +47,12 @@ userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        throw new LoginFailed('Неправильные почта или пароль');
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error('Неправильные почта или пароль'));
+            throw new LoginFailed('Неправильные почта или пароль');
           }
           const {
             password: removed,

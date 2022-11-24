@@ -5,10 +5,10 @@ const {
 } = require('../controllers/user');
 const { userAvatarValidator, userDescriptionValidator, userIdValidator } = require('../utils/celebrate');
 
-router.get('/users', getUsers);
-router.get('/users/me', getCurrentUser);
-router.get('/users/:id', userIdValidator, getUserId);
-router.patch('/users/me', userDescriptionValidator, updateUser);
-router.patch('/users/me/avatar', userAvatarValidator, updateAvatar);
+router.get('/', getUsers);
+router.get('/me', getCurrentUser);
+router.get('/:id', userIdValidator, getUserId);
+router.patch('/me', userDescriptionValidator, updateUser);
+router.patch('/me/avatar', userAvatarValidator, updateAvatar);
 
 module.exports = router;

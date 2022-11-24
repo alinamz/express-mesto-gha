@@ -39,7 +39,7 @@ const getCurrentUser = ((req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError({ message: 'Пользователь с указанным _id не найден' });
+        next(new NotFoundError('Пользователь с указанным _id не найден'));
       } else {
         res.send({ data: user });
       }
@@ -86,8 +86,12 @@ const login = ((req, res, next) => {
         .cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
         .send({ token });
     })
-    .catch(() => {
-      next(new LoginFailed('Ошибка входа'));
+    .catch((err) => {
+      if (err.name === 'UnauthorizedError') {
+        next(new LoginFailed('Ошибка входа'));
+      } else {
+        next(new ServerError('Неизвестная ошибка сервера'));
+      }
     });
 });
 

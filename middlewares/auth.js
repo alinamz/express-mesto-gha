@@ -1,15 +1,13 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
 
-const LOGIN_FAILED = 401;
+const LoginFailed = require('../errors/LoginFailed');
 
 module.exports = (req, res, next) => {
-  const { authorization } = req.headers;
-
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    res.status(401).send({ message: 'Ошибка авторизации' });
+  const token = req.cookies.jwt;
+  if (!token) {
+    next(new LoginFailed('Ошибка входа'));
   } else {
-    const token = authorization.replace(/^Bearer*\s*/i, '');
     let decoded;
 
     try {
@@ -18,7 +16,7 @@ module.exports = (req, res, next) => {
       req.user = decoded;
       next();
     } catch (err) {
-      res.status(LOGIN_FAILED).send({ message: 'Ошибка входа' });
+      next(new LoginFailed('Ошибка входа'));
     }
   }
 };

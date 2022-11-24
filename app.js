@@ -1,5 +1,6 @@
 const bodyParser = require('body-parser');
 const express = require('express');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const mongoose = require('mongoose');
@@ -8,6 +9,9 @@ const { errors } = require('celebrate');
 
 const { login, createUser } = require('./controllers/user');
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./errors/NotFoundError');
+
+const SERVER_ERROR = 500;
 
 const { userLoginValidator, userBodyValidator } = require('./utils/celebrate');
 
@@ -19,23 +23,25 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', (err) => {
   console.log('Connected to mongodb');
 });
 
+app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.post('/signin', userLoginValidator, login);
 app.post('/signup', userBodyValidator, createUser);
-
-// app.use('/', auth, cardRouter);
-app.use('/', auth, userRouter, cardRouter);
+app.use('/users', auth, userRouter);
+app.use('/cards', auth, cardRouter);
 
 // Обработка несуществующего метода.
-app.use((req, res) => {
-  res.status(404).json({ message: 'Указанный метод не найден' });
+app.all('/*', (req, res, next) => {
+  next(new NotFoundError('Указанный метод не найден'));
 });
 
 app.use(errors());
 
 app.use((err, req, res, next) => {
-  res.status(err.statusCode).send({ message: err.message });
+  const statusCode = err.statusCode || SERVER_ERROR;
+  const message = statusCode === SERVER_ERROR ? 'На сервере произошла ошибка' : err.message;
+  res.status(err.statusCode).send({ message });
   next();
 });
 
