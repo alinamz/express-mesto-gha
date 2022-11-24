@@ -87,7 +87,7 @@ const login = ((req, res, next) => {
         .send({ token });
     })
     .catch((err) => {
-      if (err.name === 'UnauthorizedError') {
+      if (err.statusCode === 401) {
         next(new LoginFailed('Ошибка входа'));
       } else {
         next(new ServerError('Неизвестная ошибка сервера'));
