@@ -1,9 +1,13 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 const app = express();
 const mongoose = require('mongoose');
+
+app.use(cors());
+app.options('*', cors());
 
 const { errors } = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
