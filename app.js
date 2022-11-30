@@ -6,6 +6,9 @@ const app = express();
 const mongoose = require('mongoose');
 
 const { errors } = require('celebrate');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+
+app.use(requestLogger);
 
 const { login, createUser } = require('./controllers/user');
 const auth = require('./middlewares/auth');
@@ -26,6 +29,12 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', (err) => {
 app.use(cookieParser());
 app.use(bodyParser.json());
 
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 app.post('/signin', userLoginValidator, login);
 app.post('/signup', userBodyValidator, createUser);
 app.use('/users', auth, userRouter);
@@ -36,6 +45,7 @@ app.all('/*', (req, res, next) => {
   next(new NotFoundError('Указанный метод не найден'));
 });
 
+app.use(errorLogger);
 app.use(errors());
 
 app.use((err, req, res, next) => {
