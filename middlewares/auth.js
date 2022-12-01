@@ -3,22 +3,25 @@ const config = require('config');
 
 const LoginFailed = require('../errors/LoginFailed');
 
-const GetTokenFromAuthHeader = (headers) => headers.Authorization.replace(/^Bearer*\s*/i, '');
-
 module.exports = (req, res, next) => {
-  const token = req.cookies.jwt == null ? GetTokenFromAuthHeader(req.headers) : req.cookies.jwt;
+  let token = req.cookies.jwt;
+  console.log('COOKIES TOKEN', token);
   if (!token) {
-    next(new LoginFailed('Ошибка входа'));
-  } else {
-    let decoded;
-
-    try {
-      const SALT = config.get('SALT');
-      decoded = jwt.verify(token, SALT);
-      req.user = decoded;
-      next();
-    } catch (err) {
+    token = req.headers.Authorization.replace(/^Bearer*\s*/i, '');
+    console.log('HEADER TOKEN', token);
+    if (!token) {
       next(new LoginFailed('Ошибка входа'));
     }
+  }
+
+  let decoded;
+
+  try {
+    const SALT = config.get('SALT');
+    decoded = jwt.verify(token, SALT);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    next(new LoginFailed('Ошибка входа'));
   }
 };
