@@ -3,8 +3,10 @@ const config = require('config');
 
 const LoginFailed = require('../errors/LoginFailed');
 
+const GetTokenFromAuthHeader = (headers) => headers.Authorization.replace(/^Bearer*\s*/i, '');
+
 module.exports = (req, res, next) => {
-  const token = req.cookies.jwt;
+  const token = req.cookies.jwt == null ? GetTokenFromAuthHeader(req.headers) : req.cookies.jwt;
   if (!token) {
     next(new LoginFailed('Ошибка входа'));
   } else {

@@ -6,8 +6,13 @@ const cors = require('cors');
 const app = express();
 const mongoose = require('mongoose');
 
-app.use(cors());
-app.options('*', cors());
+app.use(cors({
+  origin: '*',
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+  ],
+}));
 
 const { errors } = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
