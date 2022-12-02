@@ -125,7 +125,6 @@ const updateAvatar = ((req, res, next) => {
   })
     .then((user) => {
       if (!user) {
-        console.log(user);
         throw new NotFoundError({ message: 'Пользователь с указанным _id не найден' });
       } else {
         res.send(user);

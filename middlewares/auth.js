@@ -5,12 +5,9 @@ const LoginFailed = require('../errors/LoginFailed');
 
 module.exports = (req, res, next) => {
   let token = req.cookies.jwt;
-  console.log('COOKIES TOKEN', token);
   if (!token) {
-    console.log(req.headers);
     const auth = req.headers.authorization;
     token = auth == null ? null : auth.replace(/^Bearer*\s*/i, '');
-    console.log('HEADER TOKEN', token);
     if (!token) {
       next(new LoginFailed('Ошибка входа'));
     }
