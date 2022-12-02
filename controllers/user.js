@@ -11,7 +11,7 @@ const LoginFailed = require('../errors/LoginFailed');
 
 const getUsers = ((_, res, next) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.send(users))
     .catch((err) => {
       next(err);
     });
@@ -41,7 +41,7 @@ const getCurrentUser = ((req, res, next) => {
       if (!user) {
         next(new NotFoundError('Пользователь с указанным _id не найден'));
       } else {
-        res.send({ data: user });
+        res.send(user);
       }
     })
     .catch((err) => {
@@ -105,7 +105,7 @@ const updateUser = ((req, res, next) => {
       if (!user) {
         throw new NotFoundError({ message: 'Пользователь с указанным _id не найден' });
       } else {
-        res.send({ data: user });
+        res.send(user);
       }
     })
     .catch((err) => {
@@ -128,7 +128,7 @@ const updateAvatar = ((req, res, next) => {
         console.log(user);
         throw new NotFoundError({ message: 'Пользователь с указанным _id не найден' });
       } else {
-        res.send({ data: user });
+        res.send(user);
       }
     })
     .catch((err) => {
